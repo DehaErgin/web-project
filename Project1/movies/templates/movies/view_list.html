@@ -1,0 +1,129 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<style>
+    .list-movie-card {
+        background-color: #2d2d2d;
+        color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .list-movie-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+    .movie-info {
+        padding: 15px;
+    }
+    .movie-actions {
+        padding: 10px 15px;
+        background-color: #222;
+        display: flex;
+        justify-content: space-between;
+    }
+    .remove-btn {
+        color: #ff6b6b;
+        border: 1px solid #ff6b6b;
+        background: none;
+    }
+    .remove-btn:hover {
+        background-color: #ff6b6b;
+        color: #fff;
+    }
+    .back-btn {
+        background-color: #444;
+        color: #fff;
+        border: none;
+    }
+    .back-btn:hover {
+        background-color: #555;
+        color: #fff;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white mb-0">{{ user_list.name }}</h1>
+            <p class="text-muted">{{ user_list.movies.count }} movies</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn back-btn">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+    
+    <div class="row">
+        {% for movie in user_list.movies.all %}
+            <div class="col-md-6 mb-4">
+                <div class="list-movie-card shadow d-flex">
+                    <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 150px; height: 220px; object-fit: cover;">
+                    <div class="d-flex flex-column justify-content-between flex-grow-1">
+                        <div class="movie-info">
+                            <h5>{{ movie.title }}</h5>
+                            <p class="text-muted mb-2">{{ movie.year }} | {{ movie.director }}</p>
+                            <p>{{ movie.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
+                                Details
+                            </button>
+                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-star"></i> Rate
+                            </a>
+                            <form method="post" action="{% url 'remove_from_list' user_list.id movie.id %}" onsubmit="return confirm('Are you sure you want to remove this movie from your list?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm remove-btn">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie Details Modal -->
+            <div class="modal fade" id="movieDetails{{ movie.id }}" tabindex="-1" aria-labelledby="movieDetailsLabel{{ movie.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content bg-dark text-white">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="movieDetailsLabel{{ movie.id }}">{{ movie.title }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 100%; object-fit: cover;">
+                                </div>
+                                <div class="col-md-7">
+                                    <h4 class="mb-3">Details</h4>
+                                    <p><strong>Year:</strong> {{ movie.year }}</p>
+                                    <p><strong>Director:</strong> {{ movie.director }}</p>
+                                    <p><strong>Description:</strong> {{ movie.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post" action="{% url 'remove_from_list' user_list.id movie.id %}" onsubmit="return confirm('Are you sure you want to remove this movie from your list?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Remove from List</button>
+                            </form>
+                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning">
+                                <i class="bi bi-star"></i> Rate Movie
+                            </a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    This list is empty. <a href="{% url 'movies' %}" class="alert-link">Browse movies</a> to add some!
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

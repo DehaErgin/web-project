@@ -1,0 +1,59 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+    .btn-danger {
+        transition: transform 0.3s ease;
+    }
+    .btn-danger:hover {
+        transform: scale(1.1);
+    }
+</style>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-dark text-white text-center">
+                    <h3 class="mb-0">Register</h3>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="id_username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="id_password1" name="password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="id_password2" name="password2" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Register</button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <p style="color: white;">Already have an account? <a href="{% url 'login' %}" class="text-decoration-none">Sign in here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,267 @@
+{% extends 'movies/base.html' %}
+{# {% load movie_tags %} #}
+
+{% block content %}
+<style>
+    .movie-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    .movie-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+    .card-title {
+        font-weight: bold;
+        color: #fff;
+    }
+    .card-text {
+        color: #fff;
+    }
+    .text-muted {
+        color: #adb5bd !important;
+    }
+    .card-body {
+        background-color: #2d2d2d;
+    }
+    .card-footer {
+        background-color: #2d2d2d !important;
+    }
+    .btn-outline-secondary {
+        border-color: #adb5bd;
+        color: #fff;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #adb5bd;
+        color: #2d2d2d;
+    }
+    .modal-content {
+        background-color: #2d2d2d;
+        color: #fff;
+    }
+    .modal-header, .modal-footer {
+        border-color: #444;
+    }
+    .btn-close {
+        filter: invert(1);
+    }
+    .search-container {
+        background: rgba(45, 45, 45, 0.8);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .search-input {
+        background-color: #444;
+        border-color: #555;
+        color: #fff;
+    }
+    .search-input:focus {
+        background-color: #444;
+        border-color: #ff6b6b;
+        color: #fff;
+    }
+    .filter-select {
+        background-color: #444;
+        border-color: #555;
+        color: #fff;
+    }
+    .dropdown-menu {
+        background-color: #2d2d2d;
+        z-index: 1060;
+        position: absolute;
+    }
+    .dropdown {
+        position: relative;
+    }
+    .dropdown-item {
+        color: #fff;
+    }
+    .dropdown-item:hover {
+        background-color: #444;
+        color: #fff;
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-white">Movies</h1>
+    <p class="text-white">Discover and add movies to your lists</p>
+    
+    <div class="search-container">
+        <form method="get" action="{% url 'movies' %}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control search-input" placeholder="Search by title..." value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="year" class="form-select filter-select">
+                        <option value="">All Years</option>
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if request.GET.year == year|stringformat:"i" %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="director" class="form-select filter-select">
+                        <option value="">All Directors</option>
+                        {% for director in directors %}
+                            <option value="{{ director }}" {% if request.GET.director == director %}selected{% endif %}>{{ director }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-danger w-100">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 movie-card bg-dark border-0 shadow">
+                <img src="{{ movie.image }}" class="card-img-top" alt="{{ movie.title }}" style="height: 500px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        {% if movie.rating_count > 0 %}
+                        <div class="movie-rating">
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-star-fill"></i> {{ movie.average_rating|floatformat:1 }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="card-text text-muted">{{ movie.year }} | {{ movie.director }}</p>
+                    <p class="card-text">{{ movie.description|truncatechars:120 }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
+                                Details
+                            </button>
+                            <a href="{% url 'movie_comments' movie.id %}" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-chat-left-text"></i> Comments
+                            </a>
+                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning">
+                                <i class="bi bi-star"></i> Rate
+                            </a>
+                        </div>
+                        <div class="dropup">
+                            <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton{{ movie.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                Add to List
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ movie.id }}">
+                                {% if user_lists or movie_lists %}
+                                    {% for user_list in user_lists %}
+                                        <li>
+                                            <form method="post" action="{% url 'add_to_specific_list' movie.id user_list.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">{{ user_list.name }}</button>
+                                            </form>
+                                        </li>
+                                    {% endfor %}
+                                    {% for movie_list in movie_lists %}
+                                        <li>
+                                            <form method="post" action="{% url 'add_to_specific_list' movie.id movie_list.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">{{ movie_list.name }}</button>
+                                            </form>
+                                        </li>
+                                    {% endfor %}
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'create_list' %}">Create New List</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Movie Details Modal -->
+        <div class="modal fade" id="movieDetails{{ movie.id }}" tabindex="-1" aria-labelledby="movieDetailsLabel{{ movie.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="movieDetailsLabel{{ movie.id }}">{{ movie.title }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 100%; object-fit: cover;">
+                            </div>
+                            <div class="col-md-7">
+                                <h4 class="mb-3">Details</h4>
+                                <div class="d-flex align-items-center mb-3">
+                                    <p class="mb-0 me-3"><strong>Year:</strong> {{ movie.year }}</p>
+                                    {% if movie.rating_count > 0 %}
+                                    <div class="movie-rating">
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-star-fill"></i> {{ movie.average_rating|floatformat:1 }}/10
+                                            <small>({{ movie.rating_count }} votes)</small>
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <p><strong>Director:</strong> {{ movie.director }}</p>
+                                <p><strong>Description:</strong> {{ movie.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <div class="ms-auto d-flex">
+                            <a href="{% url 'movie_comments' movie.id %}" class="btn btn-outline-light me-2">
+                                <i class="bi bi-chat-left-text"></i> Comments
+                            </a>
+                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning me-2">
+                                <i class="bi bi-star"></i> Rate Movie
+                            </a>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton{{ movie.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Add to List
+                                </button>
+                                <ul class="dropdown-menu dropup" aria-labelledby="dropdownMenuButton{{ movie.id }}">
+                                    {% for list in user_lists %}
+                                    <li>
+                                        <form method="post" action="{% url 'add_to_specific_list' movie.id list.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item">{{ list.name }}</button>
+                                        </form>
+                                    </li>
+                                    {% endfor %}
+                                    {% for list in movie_lists %}
+                                    <li>
+                                        <form method="post" action="{% url 'add_to_specific_list' movie.id list.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item">{{ list.name }}</button>
+                                        </form>
+                                    </li>
+                                    {% endfor %}
+                                    {% if not user_lists and not movie_lists %}
+                                    <li><a class="dropdown-item disabled" href="#">No lists available</a></li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'create_list' %}">Create New List</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No movies available at the moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

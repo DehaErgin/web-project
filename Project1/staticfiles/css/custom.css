@@ -1,0 +1,81 @@
+/* Star Rating System Styles */
+.rating-stars {
+    unicode-bidi: bidi-override;
+    color: #ccc;
+    font-size: 1.5rem;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    width: 150px; /* 10 yıldız için genişlik */
+    overflow: hidden;
+}
+
+.rating-stars .filled-stars,
+.rating-stars .empty-stars {
+    white-space: nowrap;
+    direction: ltr;
+    display: block;
+    letter-spacing: 0;
+}
+
+.rating-stars .filled-stars {
+    color: #FFD700;
+    padding: 0;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.rating-stars .empty-stars {
+    padding: 0;
+    z-index: 0;
+}
+
+.user-rating {
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.rating-value {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    color: #fff; /* Rengi beyaz yaptım */
+}
+
+.rating-form {
+    margin: 10px 0;
+}
+
+.rating-form .btn-star {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.2s;
+}
+
+.rating-form .btn-star:hover,
+.rating-form .btn-star.selected {
+    color: #FFD700;
+}
+
+.total-ratings {
+    color: #fff; /* Rengi beyaz yaptım */
+    font-size: 0.9rem;
+    margin-left: 5px;
+    opacity: 0.8;
+} 

@@ -1,0 +1,13 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="display-3 mb-4">Discover & Share Your Favorite Films</h1>
+            <p class="lead mb-4">Track movies, create lists, and connect with other cinephiles.</p>
+            <a href="{% url 'register' %}" class="btn btn-get-started btn-lg">Get Started - It's Free!</a>
+        </div>
+    </div>
+</section>
+{% endblock %} 
