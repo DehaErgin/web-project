@@ -1,0 +1,299 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<style>
+    /* Profile page styles */
+    .card {
+        background: linear-gradient(145deg, #1a1a1a, #0a0a0a) !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 12px !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .card-header {
+        border-bottom: 1px solid #2a2a2a !important;
+        background: transparent !important;
+    }
+
+    .text-muted {
+        color: #9a9a9a !important;
+    }
+
+    .list-group-item {
+        background: transparent !important;
+        color: #ffffff !important;
+        border-color: #2a2a2a !important;
+    }
+
+    .card-title {
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+    }
+
+    .card-text {
+        color: #e0e0e0 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .profile-text p {
+        color: #ffffff !important;
+        margin-bottom: 12px !important;
+    }
+
+    .profile-name {
+        color: #ffffff !important;
+        font-size: 2rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .profile-meta {
+        color: #9a9a9a !important;
+        font-size: 0.9rem !important;
+    }
+
+    .profile-bio {
+        color: #e0e0e0 !important;
+    }
+
+    .nested-card {
+        background: linear-gradient(145deg, #1a1a1a, #0a0a0a) !important;
+        border: 1px solid #2a2a2a !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    }
+
+    .nested-card:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid #3a3a3a !important;
+    }
+
+    .section-header {
+        color: #ffffff !important;
+        font-size: 1.4rem !important;
+        font-weight: 600 !important;
+    }
+
+    .review-item {
+        border-bottom: 1px solid #2a2a2a !important;
+    }
+
+    .review-title {
+        color: #ffffff !important;
+    }
+
+    .review-content {
+        color: #e0e0e0 !important;
+    }
+
+    .badge-count {
+        background: linear-gradient(145deg, #2a2a2a, #1a1a1a) !important;
+        color: #ffffff !important;
+        border: 1px solid #3a3a3a !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+    }
+
+    .btn-primary {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        font-weight: 500 !important;
+    }
+
+    .btn-primary:hover {
+        background: #e6e6e6 !important;
+        color: #000000 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .btn-sm.btn-primary {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .profile-image img, 
+    .profile-image .bg-secondary {
+        border: 3px solid #404040 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .profile-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 2rem !important;
+        flex-wrap: wrap !important;
+    }
+
+    @media (max-width: 768px) {
+        .profile-header {
+            justify-content: center !important;
+            text-align: center !important;
+        }
+    }
+
+    .empty-list-message {
+        background-color: #1e1f22;
+        border-radius: 8px;
+        padding: 3rem 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .empty-list-message p {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    .create-list-btn {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        padding: 0.75rem 2rem !important;
+        font-size: 1.1rem !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+        text-decoration: none !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    .create-list-btn:hover {
+        background: #e6e6e6 !important;
+        color: #000000 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="profile-header">
+                <div class="profile-image">
+                    {% if profile_user.profile.profile_picture %}
+                        <img src="{{ profile_user.profile.profile_picture }}" alt="{{ profile_user.username }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                            <span class="display-4 text-white">{{ profile_user.username.0|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <h1 class="profile-name">{{ profile_user.username }}</h1>
+                    <p class="profile-meta">Member since {{ profile_user.date_joined|date:"F Y" }}</p>
+                    
+                    {% if profile_user.profile.bio %}
+                        <div class="profile-info mb-3">
+                            <p class="profile-bio">{{ profile_user.profile.bio }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if profile_user.profile.favorite_genre %}
+                        <div class="profile-info mb-3">
+                            <p class="profile-bio"><strong>Favorite Genre:</strong> {{ profile_user.profile.favorite_genre }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <span class="badge me-3 badge-count">{{ profile_user.ratings.count }} {% if profile_user.ratings.count == 1 %}Review{% else %}Reviews{% endif %}</span>
+                        <span class="badge badge-count">{{ total_lists }} {% if total_lists == 1 %}List{% else %}Lists{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0 section-header">Recent Reviews</h2>
+        </div>
+        <div class="card-body">
+            <div class="review-list">
+                {% for rating in ratings %}
+                    <div class="review-item p-3">
+                        <div class="d-flex">
+                            <div class="me-3" style="min-width: 60px; max-width: 60px;">
+                                <img src="{{ rating.movie.image }}" alt="{{ rating.movie.title }}" class="img-fluid" style="width: 60px; height: 90px; object-fit: cover;">
+                            </div>
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                                    <h5 class="mb-1 review-title">{{ rating.movie.title }} <span class="text-muted">({{ rating.movie.year }})</span></h5>
+                                    <span class="badge rounded-pill badge-count">{{ rating.score }}/10</span>
+                                </div>
+                                <div class="review-meta text-muted mb-2">{{ rating.created_at|date:"M d, Y" }}</div>
+                                {% if rating.comment %}
+                                    <p class="mb-0 review-content">{{ rating.comment }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted p-3">No recent reviews.</p>
+                {% endfor %}
+            </div>
+            
+            {% if ratings %}
+                <div class="mt-3 p-3">
+                    <a href="{% url 'member_reviews' profile_user.username %}" class="btn btn-primary">View All Reviews</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0 section-header">Movie Lists</h2>
+        </div>
+        <div class="card-body">
+            {% if movie_lists or user_lists %}
+                <div class="row g-4">
+                    {% for movie_list in movie_lists %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card nested-card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ movie_list.name }}</h5>
+                                    <p class="card-text small mb-3">{{ movie_list.description|truncatechars:70 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                                        <span class="badge badge-count">{{ movie_list.movies.count }} Movie</span>
+                                        <a href="{% url 'view_list' movie_list.id %}" class="btn btn-sm btn-primary">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% for user_list in user_lists %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card nested-card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ user_list.name }}</h5>
+                                    <p class="card-text small mb-3">{{ user_list.description|truncatechars:70 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                                        <span class="badge badge-count">{{ user_list.movies.count }} Movie</span>
+                                        <a href="{% url 'view_list' user_list.id %}" class="btn btn-sm btn-primary">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-list-message">
+                    <p>{% if profile_user == user %}You haven't created any movie lists yet.{% else %}{{ profile_user.username }} hasn't created any movie lists yet.{% endif %}</p>
+                    {% if profile_user == user %}
+                        <a href="{% url 'create_list' %}" class="create-list-btn">Create Your First List</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

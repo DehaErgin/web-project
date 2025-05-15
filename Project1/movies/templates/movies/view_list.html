@@ -3,81 +3,192 @@
 {% block content %}
 <style>
     .list-movie-card {
-        background-color: #2d2d2d;
+        background-color: #1e1f22;
         color: #fff;
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
         margin-bottom: 20px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .list-movie-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    }
-    .movie-info {
-        padding: 15px;
-    }
-    .movie-actions {
-        padding: 10px 15px;
-        background-color: #222;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
+        transition: transform 0.2s ease;
+    }
+    
+    .list-movie-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .movie-info {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         justify-content: space-between;
     }
+    
+    .movie-info h5 {
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+        color: #ffffff;
+        font-weight: 500;
+    }
+    
+    .movie-info p {
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+    }
+    
+    .movie-info .text-muted {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.95rem;
+    }
+    
+    .movie-actions {
+        padding: 1rem 1.5rem;
+        background-color: #000000;
+        display: flex;
+        gap: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
     .remove-btn {
-        color: #ff6b6b;
-        border: 1px solid #ff6b6b;
-        background: none;
-    }
-    .remove-btn:hover {
-        background-color: #ff6b6b;
-        color: #fff;
-    }
-    .back-btn {
-        background-color: #444;
-        color: #fff;
+        background-color: #ff5c72;
+        color: #ffffff;
         border: none;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        border-radius: 6px;
     }
+    
+    .remove-btn:hover {
+        background-color: #ff4359;
+        color: #ffffff;
+    }
+    
+    .back-btn {
+        background-color: transparent;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
     .back-btn:hover {
-        background-color: #555;
-        color: #fff;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .movie-poster {
+        width: 180px;
+        height: 270px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 1rem;
+    }
+    
+    .custom-title {
+        color: #ffffff;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .list-header {
+        margin-bottom: 3rem;
+    }
+    
+    .list-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        line-height: 1.6;
+    }
+    
+    .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.2);
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Modal styles */
+    .modal-content {
+        background-color: #1e1f22;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+    
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
     }
 </style>
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="text-white mb-0">{{ user_list.name }}</h1>
-            <p class="text-muted">{{ user_list.movies.count }} movies</p>
+<div class="content-spacing">
+    <div class="list-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="custom-title">{{ user_list.name }}</div>
+            {% if user_list.user %}
+                <a href="{% url 'member_detail' user_list.user.username %}" class="btn back-btn">Back to Profile</a>
+            {% else %}
+                <a href="{% url 'movies' %}" class="btn back-btn">Back to Movies</a>
+            {% endif %}
         </div>
-        <a href="{% url 'dashboard' %}" class="btn back-btn">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
-        </a>
+        {% if user_list.description %}
+        <p class="list-description">{{ user_list.description }}</p>
+        {% endif %}
     </div>
     
     <div class="row">
         {% for movie in user_list.movies.all %}
-            <div class="col-md-6 mb-4">
-                <div class="list-movie-card shadow d-flex">
-                    <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 150px; height: 220px; object-fit: cover;">
+            <div class="col-md-12 mb-4">
+                <div class="list-movie-card">
+                    <img src="{{ movie.image }}" alt="{{ movie.title }}" class="movie-poster">
                     <div class="d-flex flex-column justify-content-between flex-grow-1">
                         <div class="movie-info">
-                            <h5>{{ movie.title }}</h5>
-                            <p class="text-muted mb-2">{{ movie.year }} | {{ movie.director }}</p>
-                            <p>{{ movie.description|truncatechars:100 }}</p>
+                            <div>
+                                <h5>{{ movie.title }}</h5>
+                                <p class="text-muted mb-3">{{ movie.year }} | {{ movie.director }}</p>
+                                <p>{{ movie.description|truncatechars:200 }}</p>
+                            </div>
                         </div>
                         <div class="movie-actions">
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
+                            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
                                 Details
                             </button>
-                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-sm btn-outline-warning">
-                                <i class="bi bi-star"></i> Rate
-                            </a>
-                            <form method="post" action="{% url 'remove_from_list' user_list.id movie.id %}" onsubmit="return confirm('Are you sure you want to remove this movie from your list?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm remove-btn">
-                                    Remove
-                                </button>
-                            </form>
+                            <button class="btn remove-btn" data-bs-toggle="modal" data-bs-target="#removeMovieModal{{ movie.id }}">
+                                Remove
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -86,7 +197,7 @@
             <!-- Movie Details Modal -->
             <div class="modal fade" id="movieDetails{{ movie.id }}" tabindex="-1" aria-labelledby="movieDetailsLabel{{ movie.id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
-                    <div class="modal-content bg-dark text-white">
+                    <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="movieDetailsLabel{{ movie.id }}">{{ movie.title }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -94,7 +205,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-5">
-                                    <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 100%; object-fit: cover;">
+                                    <img src="{{ movie.image }}" alt="{{ movie.title }}" class="img-fluid rounded">
                                 </div>
                                 <div class="col-md-7">
                                     <h4 class="mb-3">Details</h4>
@@ -105,22 +216,42 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <form method="post" action="{% url 'remove_from_list' user_list.id movie.id %}" onsubmit="return confirm('Are you sure you want to remove this movie from your list?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Remove from List</button>
-                            </form>
-                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning">
-                                <i class="bi bi-star"></i> Rate Movie
-                            </a>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Remove Movie Confirmation Modal -->
+            <div class="modal fade" id="removeMovieModal{{ movie.id }}" tabindex="-1" aria-labelledby="removeMovieModalLabel{{ movie.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark text-white">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title" id="removeMovieModalLabel{{ movie.id }}">Remove Movie</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to remove "{{ movie.title }}" from this list?</p>
+                            <p class="text-danger mb-0">This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer border-secondary">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form method="post" action="{% url 'remove_from_list' user_list.id movie.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">
-                    This list is empty. <a href="{% url 'movies' %}" class="alert-link">Browse movies</a> to add some!
+                <div class="list-movie-card">
+                    <div class="movie-info text-center py-5">
+                        <div class="text-center">
+                            <h4 class="mb-3">No movies in this list yet</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endfor %}

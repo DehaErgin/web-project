@@ -1,0 +1,215 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<style>
+    /* Yorumlar sayfası için özel stil düzenlemeleri */
+    .card {
+        color: #ffffff;
+    }
+    .text-muted {
+        color: #b8b8b8 !important;
+    }
+    .review-card {
+        margin-bottom: 1.5rem;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(100, 120, 180, 0.3);
+    }
+    .review-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #ffffff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .review-meta {
+        font-size: 0.9rem;
+        color: #b8b8b8;
+        margin-bottom: 12px;
+    }
+    .review-content {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #e0e0e0;
+        word-break: break-word;
+    }
+    .review-score {
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 6px 15px;
+        border-radius: 30px;
+    }
+    .movie-poster {
+        width: 120px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        border-radius: 5px;
+        transition: transform 0.3s ease;
+    }
+    .review-card:hover .movie-poster {
+        transform: scale(1.05);
+    }
+    .page-link {
+        color: #6287c2;
+        background-color: rgba(50, 50, 60, 0.9);
+        border-color: rgba(70, 70, 90, 0.3);
+        font-size: 0.95rem;
+        padding: 8px 14px;
+    }
+    .page-link:hover {
+        color: #ffffff;
+        background-color: rgba(98, 135, 194, 0.7);
+        border-color: rgba(98, 135, 194, 0.5);
+    }
+    .page-item.active .page-link {
+        background-color: #4a6fa5;
+        border-color: #4a6fa5;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: rgba(40, 40, 50, 0.7);
+        border-color: rgba(60, 60, 80, 0.3);
+    }
+    .back-btn {
+        padding: 5px 12px;
+        font-size: 0.9rem;
+        border-radius: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .back-btn:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+    }
+    .pagination {
+        margin-top: 2rem;
+    }
+    .empty-reviews {
+        padding: 3rem 1rem;
+    }
+    .empty-title {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
+    .empty-message {
+        font-size: 1.1rem;
+    }
+    .main-content-row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .custom-title-container {
+        padding: 0 2rem;
+    }
+    .content-wrapper {
+        padding: 0 2rem;
+    }
+    .page-header {
+        padding: 2rem 0;
+    }
+</style>
+
+<div class="content-spacing">
+    <div class="row main-content-row">
+        <div class="col-12 custom-title-container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="custom-title">{{ profile_user.username }}'s Reviews</div>
+                <a href="{% url 'member_detail' profile_user.username %}" class="back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row main-content-row">
+        <div class="col-12 content-wrapper">
+            {% if ratings %}
+                {% for rating in ratings %}
+                    <div class="card mb-4 review-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex">
+                                <div class="me-4">
+                                    <img src="{{ rating.movie.image }}" alt="{{ rating.movie.title }}" class="movie-poster">
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap">
+                                        <h4 class="review-title">{{ rating.movie.title }}</h4>
+                                        <span class="badge review-score {% if rating.score >= 7 %}bg-success{% elif rating.score >= 4 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ rating.score }}/10
+                                        </span>
+                                    </div>
+                                    <div class="review-meta">
+                                        <span class="me-3"><i class="bi bi-calendar3"></i> {{ rating.created_at|date:"F d, Y" }}</span>
+                                        <span><i class="bi bi-film"></i> {{ rating.movie.year }}</span>
+                                    </div>
+                                    {% if rating.comment %}
+                                        <div class="review-content">{{ rating.comment }}</div>
+                                    {% else %}
+                                        <p class="text-muted fst-italic">No comment added.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% if ratings.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if ratings.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ ratings.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in ratings.paginator.page_range %}
+                            {% if ratings.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if ratings.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ ratings.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center empty-reviews">
+                        <h4 class="text-white empty-title">No reviews yet</h4>
+                        <p class="text-muted empty-message">{{ profile_user.username }} hasn't reviewed any movies yet.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

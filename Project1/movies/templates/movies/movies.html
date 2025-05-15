@@ -3,91 +3,154 @@
 
 {% block content %}
 <style>
-    .movie-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        margin-bottom: 20px;
-        overflow: hidden;
-        border-radius: 8px;
+    .page-header {
+        margin-bottom: 3rem;
     }
-    .movie-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
     }
-    .card-title {
-        font-weight: bold;
-        color: #fff;
+    
+    .page-description {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
     }
-    .card-text {
-        color: #fff;
-    }
-    .text-muted {
-        color: #adb5bd !important;
-    }
-    .card-body {
-        background-color: #2d2d2d;
-    }
-    .card-footer {
-        background-color: #2d2d2d !important;
-    }
-    .btn-outline-secondary {
-        border-color: #adb5bd;
-        color: #fff;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #adb5bd;
-        color: #2d2d2d;
-    }
-    .modal-content {
-        background-color: #2d2d2d;
-        color: #fff;
-    }
-    .modal-header, .modal-footer {
-        border-color: #444;
-    }
-    .btn-close {
-        filter: invert(1);
-    }
+    
     .search-container {
-        background: rgba(45, 45, 45, 0.8);
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
+        background-color: #1e1f22;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 3rem;
     }
-    .search-input {
-        background-color: #444;
-        border-color: #555;
-        color: #fff;
+    
+    .search-input, .filter-select {
+        background-color: #000000;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-radius: 6px;
     }
-    .search-input:focus {
-        background-color: #444;
-        border-color: #ff6b6b;
-        color: #fff;
+    
+    .search-input:focus, .filter-select:focus {
+        background-color: #000000;
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: none;
+        color: #ffffff;
     }
-    .filter-select {
-        background-color: #444;
-        border-color: #555;
-        color: #fff;
+    
+    .movie-card {
+        background-color: #1e1f22;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+        height: 100%;
     }
+    
+    .movie-card img {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+    }
+    
+    .movie-card .card-body {
+        padding: 1.5rem;
+        background-color: #1e1f22;
+    }
+    
+    .movie-card .card-title {
+        color: #ffffff;
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .movie-card .card-text {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .movie-card .text-muted {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+    
+    .movie-rating .badge {
+        background-color: #ff5c72 !important;
+        color: #ffffff !important;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+    }
+    
+    .btn-danger {
+        background-color: #ff5c72;
+        border: none;
+        padding: 0.75rem 1.2rem;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    .btn-danger:hover {
+        background-color: #ff4359;
+    }
+    
+    .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.2);
+        padding: 0.75rem 1.2rem;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
     .dropdown-menu {
-        background-color: #2d2d2d;
-        z-index: 1060;
-        position: absolute;
+        background-color: #1e1f22;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
     }
-    .dropdown {
-        position: relative;
-    }
+    
     .dropdown-item {
-        color: #fff;
+        color: #ffffff;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
     }
+    
     .dropdown-item:hover {
-        background-color: #444;
-        color: #fff;
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .dropdown-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 0.5rem 0;
+    }
+    
+    .alert-info {
+        background-color: #1e1f22;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        padding: 2rem;
+        text-align: center;
+        border-radius: 12px;
     }
 </style>
 
-<div class="container mt-5">
-    <h1 class="mb-4 text-white">Movies</h1>
-    <p class="text-white">Discover and add movies to your lists</p>
+<div class="content-spacing">
+    <div class="page-header">
+        <h1 class="page-title text-white">Movies</h1>
+        <p class="page-description">Discover and add movies to your lists</p>
+    </div>
     
     <div class="search-container">
         <form method="get" action="{% url 'movies' %}">
@@ -118,38 +181,28 @@
         </form>
     </div>
     
-    <div class="row">
+    <div class="row g-4">
         {% for movie in movies %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 movie-card bg-dark border-0 shadow">
-                <img src="{{ movie.image }}" class="card-img-top" alt="{{ movie.title }}" style="height: 500px; object-fit: cover; border-radius: 8px 8px 0 0;">
+        <div class="col-md-4">
+            <div class="movie-card">
+                <img src="{{ movie.image }}" alt="{{ movie.title }}">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="card-title">{{ movie.title }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">{{ movie.title }}</h5>
                         {% if movie.rating_count > 0 %}
                         <div class="movie-rating">
-                            <span class="badge bg-warning text-dark">
+                            <span class="badge">
                                 <i class="bi bi-star-fill"></i> {{ movie.average_rating|floatformat:1 }}
                             </span>
                         </div>
                         {% endif %}
                     </div>
-                    <p class="card-text text-muted">{{ movie.year }} | {{ movie.director }}</p>
-                    <p class="card-text">{{ movie.description|truncatechars:120 }}</p>
-                </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
-                                Details
-                            </button>
-                            <a href="{% url 'movie_comments' movie.id %}" class="btn btn-outline-secondary me-2">
-                                <i class="bi bi-chat-left-text"></i> Comments
-                            </a>
-                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning">
-                                <i class="bi bi-star"></i> Rate
-                            </a>
-                        </div>
+                    <p class="text-muted">{{ movie.year }} | {{ movie.director }}</p>
+                    <p class="card-text">{{ movie.description|truncatechars:150 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#movieDetails{{ movie.id }}">
+                            Details
+                        </button>
                         <div class="dropup">
                             <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton{{ movie.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                 Add to List
@@ -157,20 +210,20 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ movie.id }}">
                                 {% if user_lists or movie_lists %}
                                     {% for user_list in user_lists %}
-                                        <li>
-                                            <form method="post" action="{% url 'add_to_specific_list' movie.id user_list.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="dropdown-item">{{ user_list.name }}</button>
-                                            </form>
-                                        </li>
+                                        <form method="post" action="{% url 'add_to_specific_list' movie.id user_list.id %}">
+                                            {% csrf_token %}
+                                            <li>
+                                                <button type="submit" class="dropdown-item w-100 text-start">{{ user_list.name }}</button>
+                                            </li>
+                                        </form>
                                     {% endfor %}
                                     {% for movie_list in movie_lists %}
-                                        <li>
-                                            <form method="post" action="{% url 'add_to_specific_list' movie.id movie_list.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="dropdown-item">{{ movie_list.name }}</button>
-                                            </form>
-                                        </li>
+                                        <form method="post" action="{% url 'add_to_specific_list' movie.id movie_list.id %}">
+                                            {% csrf_token %}
+                                            <li>
+                                                <button type="submit" class="dropdown-item w-100 text-start">{{ movie_list.name }}</button>
+                                            </li>
+                                        </form>
                                     {% endfor %}
                                     <li><hr class="dropdown-divider"></li>
                                 {% endif %}
@@ -185,7 +238,7 @@
         <!-- Movie Details Modal -->
         <div class="modal fade" id="movieDetails{{ movie.id }}" tabindex="-1" aria-labelledby="movieDetailsLabel{{ movie.id }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content bg-dark text-white">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="movieDetailsLabel{{ movie.id }}">{{ movie.title }}</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -193,63 +246,33 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-5">
-                                <img src="{{ movie.image }}" alt="{{ movie.title }}" style="width: 100%; object-fit: cover;">
+                                <img src="{{ movie.image }}" alt="{{ movie.title }}" class="img-fluid rounded">
                             </div>
                             <div class="col-md-7">
-                                <h4 class="mb-3">Details</h4>
-                                <div class="d-flex align-items-center mb-3">
-                                    <p class="mb-0 me-3"><strong>Year:</strong> {{ movie.year }}</p>
-                                    {% if movie.rating_count > 0 %}
-                                    <div class="movie-rating">
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="bi bi-star-fill"></i> {{ movie.average_rating|floatformat:1 }}/10
-                                            <small>({{ movie.rating_count }} votes)</small>
-                                        </span>
-                                    </div>
-                                    {% endif %}
+                                <h4 class="mb-3 text-white">Details</h4>
+                                <p class="text-white"><strong>Year:</strong> {{ movie.year }}</p>
+                                <p class="text-white"><strong>Director:</strong> {{ movie.director }}</p>
+                                <p class="text-white"><strong>Description:</strong> {{ movie.description }}</p>
+                                {% if movie.rating_count > 0 %}
+                                <div class="movie-rating mt-3">
+                                    <span class="badge">
+                                        <i class="bi bi-star-fill"></i> {{ movie.average_rating|floatformat:1 }}/10
+                                        <small>({{ movie.rating_count }} votes)</small>
+                                    </span>
                                 </div>
-                                <p><strong>Director:</strong> {{ movie.director }}</p>
-                                <p><strong>Description:</strong> {{ movie.description }}</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <div class="ms-auto d-flex">
-                            <a href="{% url 'movie_comments' movie.id %}" class="btn btn-outline-light me-2">
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'movie_comments' movie.id %}" class="btn btn-outline-light">
                                 <i class="bi bi-chat-left-text"></i> Comments
                             </a>
-                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-warning me-2">
+                            <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-light">
                                 <i class="bi bi-star"></i> Rate Movie
                             </a>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton{{ movie.id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Add to List
-                                </button>
-                                <ul class="dropdown-menu dropup" aria-labelledby="dropdownMenuButton{{ movie.id }}">
-                                    {% for list in user_lists %}
-                                    <li>
-                                        <form method="post" action="{% url 'add_to_specific_list' movie.id list.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="dropdown-item">{{ list.name }}</button>
-                                        </form>
-                                    </li>
-                                    {% endfor %}
-                                    {% for list in movie_lists %}
-                                    <li>
-                                        <form method="post" action="{% url 'add_to_specific_list' movie.id list.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="dropdown-item">{{ list.name }}</button>
-                                        </form>
-                                    </li>
-                                    {% endfor %}
-                                    {% if not user_lists and not movie_lists %}
-                                    <li><a class="dropdown-item disabled" href="#">No lists available</a></li>
-                                    {% endif %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'create_list' %}">Create New List</a></li>
-                                </ul>
-                            </div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>

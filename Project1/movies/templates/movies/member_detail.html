@@ -1,0 +1,290 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+
+{% block title %}{{ member.user.username }}'s Profile - MovieList{% endblock %}
+
+{% block content %}
+<style>
+    .profile-header {
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-name {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .profile-username {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .profile-bio {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+    }
+
+    .movie-list-card {
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .movie-list-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .list-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+
+    .list-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .list-meta {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+    }
+
+    .review-card {
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .review-movie-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .review-rating {
+        background: #ff5c72;
+        color: #ffffff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 500;
+        margin-left: 1rem;
+    }
+
+    .review-date {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+    }
+
+    .review-content {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+    }
+
+    .btn-view-more {
+        background: #ff5c72;
+        color: #ffffff;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view-more:hover {
+        background: #ff4359;
+        color: #ffffff;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: #1a1a1a;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.2);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: #ffffff;
+        color: #000000;
+        border: 1px solid #ffffff;
+        padding: 12px 30px;
+        font-size: 18px;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        background: transparent;
+        color: #ffffff;
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        padding: 12px 30px;
+        font-size: 18px;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-outline-primary:hover {
+        background: #ffffff;
+        color: #000000;
+    }
+</style>
+
+<div class="content-spacing">
+    <div class="profile-header text-center">
+        <img src="{{ member.avatar.url }}" alt="{{ member.user.username }}" class="profile-avatar">
+        <h1 class="profile-name">{{ member.user.get_full_name|default:member.user.username }}</h1>
+        <p class="profile-username">@{{ member.user.username }}</p>
+        {% if member.bio %}
+            <p class="profile-bio">{{ member.bio }}</p>
+        {% endif %}
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ member.movie_lists.count }}</div>
+                <div class="stat-label">Lists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ member.ratings.count }}</div>
+                <div class="stat-label">Reviews</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="section-title">Movie Lists</h2>
+            {% if member.movie_lists.all %}
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for list in member.movie_lists.all %}
+                        <div class="col">
+                            <div class="movie-list-card">
+                                <h3 class="list-title">{{ list.title }}</h3>
+                                <p class="list-description">{{ list.description|truncatechars:100 }}</p>
+                                <div class="list-meta">
+                                    {{ list.movies.count }} movies
+                                </div>
+                                <div class="text-end mt-3">
+                                    <a href="{% url 'view_list' list.id %}" class="btn btn-view-more">
+                                        View List
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <p class="empty-state-text">No movie lists yet</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            <h2 class="section-title">Recent Reviews</h2>
+            {% if member.ratings.all %}
+                {% for rating in member.ratings.all|slice:":5" %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div>
+                                <h4 class="review-movie-title">{{ rating.movie.title }}</h4>
+                                <span class="review-date">{{ rating.created_at|date:"F j, Y" }}</span>
+                            </div>
+                            <span class="review-rating">{{ rating.score }}/10</span>
+                        </div>
+                        {% if rating.comment %}
+                            <p class="review-content">{{ rating.comment|truncatechars:150 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="empty-state-text">No reviews yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

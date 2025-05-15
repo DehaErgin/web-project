@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.db.models import Q
 from .models import Movie, UserList, Comment, Rating, MovieList
 
@@ -158,13 +158,21 @@ def add_to_list(request, movie_id):
 @login_required
 def add_to_specific_list(request, movie_id, list_id):
     movie = get_object_or_404(Movie, id=movie_id)
-    user_list = get_object_or_404(UserList, id=list_id, user=request.user)
-    
-    # Add the movie to the specified list
-    user_list.movies.add(movie)
-    messages.success(request, f'Added "{movie.title}" to your list "{user_list.name}"!')
-    
-    return redirect('movies')
+    # Try to get the list from UserList first
+    try:
+        user_list = UserList.objects.get(id=list_id, user=request.user)
+        user_list.movies.add(movie)
+        messages.success(request, f'Added "{movie.title}" to your list "{user_list.name}"!')
+        return redirect('movies')
+    except UserList.DoesNotExist:
+        # If not found in UserList, try MovieList
+        try:
+            movie_list = MovieList.objects.get(id=list_id, user=request.user)
+            movie_list.movies.add(movie)
+            messages.success(request, f'Added "{movie.title}" to your list "{movie_list.name}"!')
+            return redirect('movies')
+        except MovieList.DoesNotExist:
+            raise Http404("List not found")
 
 @login_required
 def delete_list(request, list_id):
@@ -176,19 +184,43 @@ def delete_list(request, list_id):
 
 @login_required
 def view_list(request, list_id):
-    user_list = get_object_or_404(UserList, id=list_id, user=request.user)
-    return render(request, 'movies/view_list.html', {'user_list': user_list})
+    # Try to get the list from UserList first
+    try:
+        user_list = UserList.objects.get(id=list_id)
+        return render(request, 'movies/view_list.html', {
+            'user_list': user_list,
+            'is_own_list': user_list.user == request.user
+        })
+    except UserList.DoesNotExist:
+        # If not found in UserList, try MovieList
+        try:
+            movie_list = MovieList.objects.get(id=list_id)
+            return render(request, 'movies/view_list.html', {
+                'user_list': movie_list,
+                'is_own_list': movie_list.user == request.user
+            })
+        except MovieList.DoesNotExist:
+            raise Http404("List not found")
 
 @login_required
 def remove_from_list(request, list_id, movie_id):
-    user_list = get_object_or_404(UserList, id=list_id, user=request.user)
-    movie = get_object_or_404(Movie, id=movie_id)
-    
-    # Remove the movie from the list
-    user_list.movies.remove(movie)
-    messages.success(request, f'Removed "{movie.title}" from your list "{user_list.name}".')
-    
-    return redirect('view_list', list_id=list_id)
+    # Try to get the list from UserList first
+    try:
+        user_list = UserList.objects.get(id=list_id, user=request.user)
+        movie = get_object_or_404(Movie, id=movie_id)
+        user_list.movies.remove(movie)
+        messages.success(request, f'Removed "{movie.title}" from your list "{user_list.name}".')
+        return redirect('view_list', list_id=list_id)
+    except UserList.DoesNotExist:
+        # If not found in UserList, try MovieList
+        try:
+            movie_list = MovieList.objects.get(id=list_id, user=request.user)
+            movie = get_object_or_404(Movie, id=movie_id)
+            movie_list.movies.remove(movie)
+            messages.success(request, f'Removed "{movie.title}" from your list "{movie_list.name}".')
+            return redirect('view_list', list_id=list_id)
+        except MovieList.DoesNotExist:
+            raise Http404("List not found")
 
 @login_required
 def movie_comments(request, movie_id):

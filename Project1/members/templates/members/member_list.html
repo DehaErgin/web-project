@@ -1,0 +1,162 @@
+{% extends 'movies/base.html' %}
+
+{% block content %}
+<style>
+    /* Member Card Styles */
+    .member-card {
+        background: linear-gradient(145deg, #1a1a1a, #0a0a0a) !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 12px !important;
+        padding: 2rem !important;
+        height: 100% !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .member-card:hover {
+        transform: translateY(-8px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid #3a3a3a !important;
+        background: linear-gradient(145deg, #222222, #0f0f0f) !important;
+    }
+
+    .profile-img-container {
+        position: relative !important;
+        display: inline-block !important;
+        border-radius: 50% !important;
+        padding: 3px !important;
+        background: linear-gradient(145deg, #2a2a2a, #1a1a1a) !important;
+        margin-bottom: 20px !important;
+        border: 3px solid #404040 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .profile-placeholder {
+        width: 100px !important;
+        height: 100px !important;
+        background: linear-gradient(145deg, #333333, #222222) !important;
+        color: #ffffff !important;
+        font-size: 2.5rem !important;
+        border: none !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .member-card .card-title {
+        color: #ffffff !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 1rem !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .member-card .card-text,
+    .member-card .text-muted {
+        color: #9a9a9a !important;
+        font-size: 0.9rem !important;
+    }
+
+    .badge-container {
+        margin-bottom: 20px !important;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 10px !important;
+    }
+
+    .movie-count-badge {
+        background: linear-gradient(145deg, #2a2a2a, #1a1a1a) !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #3a3a3a !important;
+        font-size: 0.85rem !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+        font-weight: 500 !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .member-btn {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        padding: 8px 20px !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+        margin-top: 15px !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .member-btn:hover {
+        background: #e6e6e6 !important;
+        color: #000000 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .members-grid {
+        padding: 20px 0 !important;
+    }
+
+    .section-title {
+        color: #ffffff !important;
+        font-size: 2rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 2rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    @media (max-width: 767px) {
+        .member-card {
+            padding: 1.5rem !important;
+        }
+        
+        .profile-placeholder {
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 2rem !important;
+        }
+    }
+</style>
+
+<div class="container py-4">
+    <h1 class="section-title mb-4">Members</h1>
+    
+    <div class="row members-grid">
+        {% for member in members %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card member-card">
+                    <div class="card-body text-center">
+                        {% if member.profile.profile_picture %}
+                            <div class="profile-img-container">
+                                <img src="{{ member.profile.profile_picture }}" alt="{{ member.username }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                            </div>
+                        {% else %}
+                            <div class="profile-img-container">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center profile-placeholder">
+                                    <span>{{ member.username.0|upper }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <h5 class="card-title">{{ member.username }}</h5>
+                        {% if member.profile.favorite_genre %}
+                            <p class="card-text">
+                                <small>Favorite genre: {{ member.profile.favorite_genre }}</small>
+                            </p>
+                        {% endif %}
+                        
+                        <div class="badge-container">
+                            <span class="badge movie-count-badge">{{ member.ratings.count }} Review</span>
+                            <span class="badge movie-count-badge">{{ member.total_lists }} List</span>
+                        </div>
+                        
+                        <a href="{% url 'member_detail' member.username %}" class="btn btn-primary member-btn">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="text-white">No members found.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
