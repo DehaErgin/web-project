@@ -3,173 +3,159 @@
 {% load movie_tags %}
 
 {% block content %}
-<style>
-    .movie-info {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-    .movie-poster {
-        width: 150px;
-        margin-right: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    .movie-details h2 {
-        margin-bottom: 5px;
-        color: #fff;
-    }
-    .ratings-container {
-        background-color: #2d2d2d;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    .rating-card {
-        background-color: #333;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-left: 4px solid #ff6b6b;
-    }
-    .rating-info {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #444;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
-    }
-    .user-rating {
-        background-color: #444;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: bold;
-    }
-    .rating-1, .rating-2, .rating-3, .rating-4 { color: #ff4500; }
-    .rating-5, .rating-6 { color: #ff9900; }
-    .rating-7, .rating-8 { color: #99cc00; }
-    .rating-9, .rating-10 { color: #00cc66; }
-    .rating-stat {
-        font-size: 36px;
-        font-weight: bold;
-        color: #ff6b6b;
-    }
-    .rating-users {
-        color: #aaa;
-        font-size: 14px;
-    }
-    .rating-chart {
-        height: 200px;
-        margin-top: 20px;
-        overflow-y: auto;
-        max-height: 220px;
-        width: 100%;
-    }
-    .rating-bar {
-        height: 25px;
-        background-color: #444;
-        margin-bottom: 5px;
-        border-radius: 4px;
-        position: relative;
-    }
-    .rating-fill {
-        background-color: #ff6b6b;
-        height: 100%;
-        border-radius: 4px 0 0 4px;
-    }
-    .rating-label {
-        position: absolute;
-        left: 5px;
-        top: 3px;
-        color: white;
-    }
-    .rating-count {
-        position: absolute;
-        right: 5px;
-        top: 3px;
-        color: white;
-    }
-    .card-body {
-        overflow-y: auto;
-        max-height: 400px;
-    }
-</style>
-
 <div class="container mt-5">
-    <div class="movie-info">
-        <img src="{{ movie.image }}" alt="{{ movie.title }}" class="movie-poster">
-        <div class="movie-details">
-            <h2>{{ movie.title }}</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ movie.image }}" alt="{{ movie.title }}" class="img-fluid movie-poster">
+        </div>
+        <div class="col-md-8">
+            <h1>{{ movie.title }}</h1>
             <p class="text-muted">{{ movie.year }} | {{ movie.director }}</p>
-            <div class="d-flex">
-                <a href="{% url 'movies' %}" class="btn btn-outline-secondary btn-sm me-2">
-                    <i class="bi bi-arrow-left"></i> Back to Movies
-                </a>
-                <a href="{% url 'rate_movie' movie.id %}" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-star"></i> Rate This Movie
-                </a>
+            <p>{{ movie.description }}</p>
+            
+            <div class="mb-4">
+                <a href="{% url 'movies' %}" class="btn btn-secondary">← Back to Movies</a>
+                <a href="{% url 'rate_movie' movie.id %}" class="btn btn-primary">★ Rate This Movie</a>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-5">
         <div class="col-md-8">
-            <div class="ratings-container">
-                <h3 class="text-white mb-4">User Ratings</h3>
+            <h2>User Ratings</h2>
+            {% for rating in ratings %}
+            <div class="rating-item">
+                <div class="user-rating">
+                    <span class="username">{{ rating.user.username }}</span>
+                    <span class="date">{{ rating.created_at|date:"M d, Y" }}</span>
+                    <span class="score">{{ rating.score }}/10</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="rating-stats">
+                <h3>Rating Statistics</h3>
+                <div class="overall-rating">
+                    <h2>{{ movie.average_rating|floatformat:1 }}</h2>
+                    <p>out of 10 based on {{ ratings|length }} user ratings</p>
+                </div>
                 
-                {% if ratings %}
-                    {% for rating in ratings %}
-                        <div class="rating-card">
-                            <div class="rating-info">
-                                <div>
-                                    <span class="text-white">{{ rating.user.username }}</span>
-                                    <small class="text-muted">{{ rating.created_at|date:"M d, Y" }}</small>
+                <div class="rating-chart">
+                    {% with scores="10,9,8,7,6,5,4,3,2,1"|split:"," %}
+                        {% for score in scores %}
+                            <div class="rating-bar">
+                                <span class="rating-label">{{ score }}</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-fill" style="width: {{ rating_percentages|get_item:score }}%"></div>
                                 </div>
-                                <span class="user-rating rating-{{ rating.score }}">{{ rating.score }}/10</span>
+                                <span class="rating-count">{{ rating_stats|get_item:score }}</span>
                             </div>
-                            {% if rating.comment %}
-                                <div class="rating-comment text-white">
-                                    {{ rating.comment }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="alert alert-secondary">
-                        No ratings yet. Be the first to rate this movie!
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+
+                {% if user_rating %}
+                    <div class="your-rating">
+                        Your rating: {{ user_rating.score }}/10
                     </div>
                 {% endif %}
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card bg-dark text-white">
-                <div class="card-header">Rating Statistics</div>
-                <div class="card-body text-center">
-                    <div class="rating-stat">{{ movie.average_rating|floatformat:1 }}</div>
-                    <div class="rating-users">out of 10 based on {{ movie.rating_count }} user ratings</div>
-                    
-                    <div class="rating-chart">
-                        {% for i in "10987654321"|make_list %}
-                            <div class="rating-bar">
-                                <div class="rating-fill" style="width: {{ rating_percentages|get_item:i }}%"></div>
-                                <span class="rating-label">{{ i }}</span>
-                                <span class="rating-count">{{ rating_stats|get_item:i }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    
-                    {% if user_rating %}
-                        <div class="mt-4">
-                            <div class="alert alert-info">
-                                Your rating: <strong>{{ user_rating.score }}/10</strong>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<style>
+    .rating-stats {
+        background-color: #1e1f22;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .overall-rating {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .overall-rating h2 {
+        color: #ff4757;
+        font-size: 3em;
+        margin: 0;
+    }
+    
+    .rating-chart {
+        margin-top: 20px;
+    }
+    
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .rating-label {
+        width: 30px;
+        text-align: right;
+        margin-right: 10px;
+        color: #ffffff;
+    }
+    
+    .rating-bar-container {
+        flex-grow: 1;
+        background-color: #2d2d2d;
+        height: 20px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .rating-fill {
+        height: 100%;
+        background-color: #ff4757;
+        transition: width 0.3s ease;
+    }
+    
+    .rating-count {
+        width: 30px;
+        text-align: left;
+        margin-left: 10px;
+        color: #ffffff;
+    }
+    
+    .your-rating {
+        margin-top: 20px;
+        text-align: center;
+        padding: 10px;
+        background-color: #2d2d2d;
+        border-radius: 6px;
+        color: #ffffff;
+    }
+    
+    .rating-item {
+        background-color: #1e1f22;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .user-rating {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .username {
+        color: #ffffff;
+        font-weight: 500;
+    }
+    
+    .date {
+        color: #666;
+    }
+    
+    .score {
+        color: #ff4757;
+        font-weight: 500;
+    }
+</style>
 {% endblock %} 

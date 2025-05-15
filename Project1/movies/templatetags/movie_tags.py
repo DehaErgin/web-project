@@ -18,4 +18,9 @@ def calculate_percentage(count, total):
 @register.filter
 def get_item(dictionary, key):
     """Get an item from a dictionary using bracket notation"""
-    return dictionary.get(str(key), 0) 
+    return dictionary.get(str(key), 0)
+
+@register.filter
+def split(value, delimiter=','):
+    """Split a string into a list using the specified delimiter"""
+    return value.split(delimiter) 
