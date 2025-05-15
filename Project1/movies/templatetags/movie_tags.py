@@ -13,4 +13,9 @@ def calculate_percentage(count, total):
     """Calculate the percentage of votes for a specific score"""
     if total == 0:
         return 0
-    return (count / total) * 100 
+    return (count / total) * 100
+
+@register.filter
+def get_item(dictionary, key):
+    """Get an item from a dictionary using bracket notation"""
+    return dictionary.get(str(key), 0) 

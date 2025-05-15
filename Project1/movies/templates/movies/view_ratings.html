@@ -1,6 +1,6 @@
 {% extends 'movies/base.html' %}
 {% load static %}
-{# {% load movie_tags %} #}
+{% load movie_tags %}
 
 {% block content %}
 <style>
@@ -153,9 +153,9 @@
                     <div class="rating-chart">
                         {% for i in "10987654321"|make_list %}
                             <div class="rating-bar">
-                                <div class="rating-fill" style="width: 0%"></div>
+                                <div class="rating-fill" style="width: {{ rating_percentages|get_item:i }}%"></div>
                                 <span class="rating-label">{{ i }}</span>
-                                <span class="rating-count">0</span>
+                                <span class="rating-count">{{ rating_stats|get_item:i }}</span>
                             </div>
                         {% endfor %}
                     </div>

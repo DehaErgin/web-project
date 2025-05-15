@@ -295,6 +295,15 @@ def view_ratings(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     ratings = movie.ratings.all()
     
+    # Calculate rating statistics
+    rating_stats = {str(i): 0 for i in range(1, 11)}  # Initialize counts for ratings 1-10
+    for rating in ratings:
+        rating_stats[str(rating.score)] += 1
+    
+    # Calculate percentages for the rating bars
+    max_count = max(rating_stats.values()) if rating_stats.values() else 1
+    rating_percentages = {score: (count / max_count) * 100 for score, count in rating_stats.items()}
+    
     # Check if the current user has rated this movie
     user_rating = None
     if request.user.is_authenticated:
@@ -303,6 +312,8 @@ def view_ratings(request, movie_id):
     context = {
         'movie': movie,
         'ratings': ratings,
-        'user_rating': user_rating
+        'user_rating': user_rating,
+        'rating_stats': rating_stats,
+        'rating_percentages': rating_percentages
     }
     return render(request, 'movies/view_ratings.html', context)

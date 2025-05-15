@@ -48,17 +48,27 @@
         overflow: hidden;
         margin-bottom: 2.5rem;
         height: 100%;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
     }
     
     .movie-card img {
         width: 100%;
-        height: 450px;
+        aspect-ratio: 2/3;
         object-fit: cover;
+        background-color: #1e1f22;
+        padding: 0;
+        margin: 0;
+        display: block;
     }
     
     .movie-card .card-body {
         padding: 1.5rem;
         background-color: #1e1f22;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
     }
     
     .movie-card .card-title {
@@ -66,18 +76,32 @@
         font-size: 1.4rem;
         margin-bottom: 0.8rem;
         font-weight: 500;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 3.4rem;
     }
     
     .movie-card .card-text {
         color: rgba(255, 255, 255, 0.8);
         line-height: 1.6;
         margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
     }
     
     .movie-card .text-muted {
         color: rgba(255, 255, 255, 0.5) !important;
         font-size: 0.95rem;
         margin-bottom: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .movie-rating .badge {
@@ -185,7 +209,9 @@
         {% for movie in movies %}
         <div class="col-md-4">
             <div class="movie-card">
-                <img src="{{ movie.image }}" alt="{{ movie.title }}">
+                <img src="{{ movie.image }}" 
+                     alt="{{ movie.title }}"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/500x750.png?text=No+Image+Available';">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h5 class="card-title mb-0">{{ movie.title }}</h5>
